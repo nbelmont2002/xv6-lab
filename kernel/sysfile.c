@@ -505,7 +505,7 @@ sys_pipe(void)
 }
 
 uint64
-sys_symlink(void)
+sys_symlink(char *target, char *path)
 {
   return 0;
 }
