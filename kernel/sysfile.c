@@ -507,4 +507,5 @@ sys_pipe(void)
 uint64
 sys_symlink(void)
 {
+  return 0;
 }
