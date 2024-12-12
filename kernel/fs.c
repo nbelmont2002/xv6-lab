@@ -382,8 +382,8 @@ iunlockput(struct inode *ip)
 static uint
 bmap(struct inode *ip, uint bn)
 {
-  uint addr, *a, *a1;
-  struct buf *bp, *bp1;
+  uint addr, *a, *a2;
+  struct buf *bp, *bp2;
 
   if(bn < NDIRECT){
     if((addr = ip->addrs[bn]) == 0){
@@ -429,35 +429,35 @@ if (bn < DNINDIRECT) {
 // bc we need to make another indirect block that has this block pointing to it
           bp = bread(ip->dev, addr);
             a = (uint*)bp->data;
-            uint first_level_index = bn / NINDIRECT;
+            uint firstLevel = bn / NINDIRECT;
 
-              if((addr = a[first_level_index]) == 0){
+              if((addr = a[firstLevel]) == 0){
                 addr = balloc(ip->dev);
                 if (addr == 0) {
                   brelse(bp);
                   return 0;
               }
-              a[first_level_index] = addr;
+              a[firstLevel] = addr;
                 log_write(bp);
  }
     brelse(bp);
 
     // Read first-level indirect block
-    bp1 = bread(ip->dev, addr);
-    a1 = (uint *)bp1->data;
+    bp2 = bread(ip->dev, addr);
+    a2 = (uint *)bp2->data;
 
     // Locate and allocate final data block
-    uint final_block_index = bn % NINDIRECT;
-    if ((addr = a1[final_block_index]) == 0) {
+    uint secondLevel = bn % NINDIRECT;
+    if ((addr = a2[secondLevel]) == 0) {
       addr = balloc(ip->dev);
       if (addr == 0) {
-        brelse(bp1);
+        brelse(bp2);
         return 0;
       }
-      a1[final_block_index] = addr;
-      log_write(bp1); // Save first-level block changes
+      a2[secondLevel] = addr;
+      log_write(bp2); // Save first-level block changes
     }
-    brelse(bp1);
+    brelse(bp2);
 
     return addr;
   }
