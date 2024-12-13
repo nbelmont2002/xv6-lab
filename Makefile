@@ -190,9 +190,6 @@ UPROGS=\
 	$U/_zombie\
 	$U/_symlinktest\
 
-
-
-
 ifeq ($(LAB),lock)
 UPROGS += \
 	$U/_stats
